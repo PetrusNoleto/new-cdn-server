@@ -13,6 +13,14 @@ export async function imageRoutes(api: FastifyInstance) {
 		},
 		handler: imageController.upload,
 	});
+	 api.withTypeProvider<ZodTypeProvider>().get("/quenq/remove/bg", {
+		schema: {
+			tags: ["Imagens"],
+			summary: "retiviere images to remove background",
+			description: "retiviere images to remove background",
+		},
+		handler: imageController.listToRemoveBackground,
+	});
     api.withTypeProvider<ZodTypeProvider>().get("/:id", {
 		schema: {
 			tags: ["Imagens"],

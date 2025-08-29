@@ -31,5 +31,18 @@ class ImageRepository {
             return null
         }
     }
+    public async listToRemoveBackground(){
+        try{
+            return await databaseConnection.images.findMany({
+                where:{
+                    removeBackground:true,
+                    backgroundRemovedIn:null,
+                    backgroundRemovedUrl:null,
+                }
+            })
+        }catch(error){
+            return null
+        }
+    }
 }
 export default ImageRepository

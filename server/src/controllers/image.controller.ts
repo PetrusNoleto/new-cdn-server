@@ -40,6 +40,7 @@ class ImageController {
                     deleted:false
                  })
             }
+            console.log(removeBackground)
             const saveInDatabase = await new ImageFactory({
                 id:newId,
                 removeBackground:removeBackground && removeBackground === "true" ? true : false,
@@ -109,7 +110,16 @@ class ImageController {
         }
     }
     public async listToRemoveBackground(request: FastifyRequest, reply: FastifyReply){
-
+         try{
+            const getImages = await new ImageRepository().listToRemoveBackground()
+            if(!getImages){
+                return reply.status(404).send({message:"images not found",data:null})
+            }
+            return reply.status(200).send({message:"images found",data:getImages})
+        }catch(error){
+            console.error(error)
+            return reply.status(500).send({message:"internal server error",data:null})
+        }
     }
     public async listProcessed(request: FastifyRequest, reply: FastifyReply){
 
