@@ -2,31 +2,31 @@ import ImageRepository from "../repositories/imageRepository"
 
 export interface ImageModelType{
   id:string
-  type?:string
-  location?:string
-  urls?:string
-  processed?:boolean
-  removeBackground?:boolean
-  backgroundRemovedIn?:Date
-  backgroundRemovedUrl?:string
-  webhookUrl?:string
+  type:string | null
+  location:string | null
+  urls:string | null
+  processed:boolean | null
+  removeBackground:boolean | null
+  backgroundRemovedIn:Date | null
+  backgroundRemovedUrl:string | null
+  webhookUrl:string | null
   createdAt:Date 
-  updated?:Date
+  updated:Date | null
 }
 
 class Image {
   private repository:ImageRepository
   private id:string
-  private type?:string
-  private location?:string
-  private urls?:string
-  private processed?:boolean
-  private removeBackground?:boolean
-  private backgroundRemovedIn?:Date
-  private backgroundRemovedUrl?:string
-  private webhookUrl?:string
+  private type:string | null
+  private location:string | null
+  private urls:string | null
+  private processed:boolean | null
+  private removeBackground:boolean | null
+  private backgroundRemovedIn:Date | null
+  private backgroundRemovedUrl:string | null
+  private webhookUrl:string | null
   private createdAt:Date 
-  private updated?:Date
+  private updated:Date | null
   constructor(image:ImageModelType){
     this.repository = new ImageRepository()   
     this.id = image.id

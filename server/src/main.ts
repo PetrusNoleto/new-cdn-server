@@ -17,6 +17,7 @@ import {
 	storagePath,
 } from "./config/server.config";
 import { uploadRoutes } from "./routes/upload.routes";
+import { imageRoutes } from "./routes/images.routes";
 const serverAddressUrl = serverAddress;
 const server = fastify({
 	logger: true,
@@ -59,10 +60,9 @@ server.register(ScalarApiReference, {
 	},
 });
 
-server.register(uploadRoutes,{
-	prefix:"/uploads/v1"
+server.register(imageRoutes,{
+	prefix:"/api/v1/images"
 })
-
 export default async function StartServer(host: string, port: number) {
 	try {
 		server.listen({ host, port }, () => {

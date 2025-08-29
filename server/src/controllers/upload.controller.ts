@@ -6,6 +6,7 @@ import fs,{ createWriteStream } from "node:fs";
 import { promisify } from "node:util";
 import { extname, resolve } from "node:path";
 import { serverAddress } from "../config/server.config";
+import ImageFactory from "../factories/ImageFactory";
 const pump = promisify(pipeline);
 class UploadController {
     public async image(request: FastifyRequest, reply: FastifyReply){
@@ -22,14 +23,24 @@ class UploadController {
 		try {
 			const buffer = await upload.toBuffer();
 			const base64 = `data:${upload.mimetype};base64,${buffer.toString("base64")}`;
-			 const saveOnDisk = await storageService.saveImage(
+			const saveOnDisk = await storageService.saveImage(
                 base64,
                 `images/uploads`,
-                newId,)
+                newId)
             if (saveOnDisk.error !== null) {
                 return reply.status(400).send({ message: "Erro ao salvar o arquivo." });
             }
-           return reply.status(200).send(saveOnDisk.data); 
+            const saveInDatabase = await new ImageFactory({
+                id:newId,
+                location:saveOnDisk.data?.location,
+                urls:saveOnDisk.data?.urls
+            }).execute()
+            if(saveInDatabase === "image not saved"){
+                const deleteImage = await storageService.deleteImage(`images/uploads`,newId)
+
+                return reply.status(400).send({ message: "Erro ao salvar o arquivo.",data:deleteImage});
+            }
+           return reply.status(201).send(saveInDatabase); 
 		} catch (error) {
 			console.error("Erro no upload de avatar:", error);
 			return reply

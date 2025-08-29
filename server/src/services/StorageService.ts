@@ -27,27 +27,26 @@ class StorageService {
 		await sharp(buffer).jpeg({ quality: 100 }).toFile(`${fullPath}.jpeg`);
 		const returnObj = (
 			{
-				webp:`${serverAddress}/static/${relativePath}/${outputFileName}.webp`,
-				png:`${serverAddress}/static/${relativePath}/${outputFileName}.png`,
-				jpeg:`${serverAddress}/static/${relativePath}/${outputFileName}.jpeg`
+				location:`/storage/${relativePath}/`,
+				urls:{
+					webp:`${serverAddress}/static/${relativePath}/${outputFileName}.webp`,
+					png:`${serverAddress}/static/${relativePath}/${outputFileName}.png`,
+					jpeg:`${serverAddress}/static/${relativePath}/${outputFileName}.jpeg`
+				}
 			}
 		)
-		return {
-			relativePath: `/${relativePath}/${outputFileName}`,
-			publicUrl: `${serverAddress}/static/${relativePath}/${outputFileName}`,
-			files:returnObj
-		};
+		return returnObj;
 	}
 	async saveImage(base64: string, pathName: string, fileName: string) {
 		try {
-			const { files, relativePath } = await this._processAndSaveImage(
+			const save = await this._processAndSaveImage(
 				base64,
 				pathName,
 				fileName,
 			);
 			return {
-				message: `Imagem salva com sucesso em /storage${relativePath}`,
-				data: files,
+				message: `Imagem salva com sucesso em ${save.location}`,
+				data: save,
 				error: null,
 			};
 		} catch (error) {
@@ -68,10 +67,12 @@ class StorageService {
 			const fullPath = path.join(
 				this.storageRoot,
 				pathName,
-				`${fileName}.webp`,
 			);
 			await fs.access(fullPath);
-			await fs.unlink(fullPath);
+			const removePng = await fs.unlink(`${fullPath}/${fileName}.png`);
+			const removeWebp =  await fs.unlink(`${fullPath}/${fileName}.webp`);
+			const removeJpg =  await fs.unlink(`${fullPath}/${fileName}.jpeg`);
+			console.log("Imagem deletada com sucesso")
 			return {
 				message: "Imagem deletada com sucesso",
 				data: null,

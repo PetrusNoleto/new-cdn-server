@@ -1,12 +1,13 @@
 import { databaseConnection } from "../config/server.config";
 
 export interface createImageProps{
-    type?:string
-    location?:string
-    urls?:string
-    processed?:boolean
-    removeBackground?:boolean
-    webhookUrl?:string
+    id?:string
+    type:string | null
+    location:string | null
+    urls:string | null
+    processed:boolean | null
+    removeBackground:boolean | null
+    webhookUrl:string | null
 }
 
 class ImageRepository {
@@ -21,7 +22,7 @@ class ImageRepository {
     }
     public async find(id:string){
         try{
-            return await databaseConnection.images.findMany({
+            return await databaseConnection.images.findUnique({
                 where:{
                     id
                 }
