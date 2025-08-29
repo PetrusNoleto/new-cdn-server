@@ -8,6 +8,7 @@ class StorageService {
 		base64: string,
 		relativePath: string,
 		fileName: string,
+		extension:string
 	) {
 		const validateBase64 = base64.match(/^data:image\/(\w+);base64,/);
 		if (!validateBase64) {
@@ -22,27 +23,52 @@ class StorageService {
 			base64.replace(/^data:image\/\w+;base64,/, ""),
 			"base64",
 		);
-		await sharp(buffer).webp({ quality: 100 }).toFile(`${fullPath}.webp`);
-		await sharp(buffer).png({ quality: 100 }).toFile(`${fullPath}.png`);
-		await sharp(buffer).jpeg({ quality: 100 }).toFile(`${fullPath}.jpeg`);
+		if(extension === "png"){
+			await sharp(buffer).png({ quality: 100 }).toFile(`${fullPath}`);
+			const returnObj = (
+			{
+				location:`/storage/${relativePath}/`,
+				url:`${serverAddress}/static/${relativePath}/${outputFileName}`
+			}
+		)
+		return returnObj;
+		}
+		if(extension === "jpeg"){
+			await sharp(buffer).jpeg({ quality: 100 }).toFile(`${fullPath}`);
+			const returnObj = (
+			{
+				location:`/storage/${relativePath}/`,
+				url:`${serverAddress}/static/${relativePath}/${outputFileName}`
+			}
+		)
+		return returnObj;
+		}
+		if(extension === "webp"){
+			await sharp(buffer).webp({ quality: 100 }).toFile(`${fullPath}`);
+			const returnObj = (
+			{
+				location:`/storage/${relativePath}/`,
+				url:`${serverAddress}/static/${relativePath}/${outputFileName}`
+			}
+		)
+		return returnObj;
+		}
+		await sharp(buffer).png({ quality: 100 }).toFile(`${fullPath}`);
 		const returnObj = (
 			{
 				location:`/storage/${relativePath}/`,
-				urls:{
-					webp:`${serverAddress}/static/${relativePath}/${outputFileName}.webp`,
-					png:`${serverAddress}/static/${relativePath}/${outputFileName}.png`,
-					jpeg:`${serverAddress}/static/${relativePath}/${outputFileName}.jpeg`
-				}
+				url:`${serverAddress}/static/${relativePath}/${outputFileName}`
 			}
 		)
 		return returnObj;
 	}
-	async saveImage(base64: string, pathName: string, fileName: string) {
+	async saveImage(base64: string, pathName: string, fileName: string,extension:string) {
 		try {
 			const save = await this._processAndSaveImage(
 				base64,
 				pathName,
 				fileName,
+				extension
 			);
 			return {
 				message: `Imagem salva com sucesso em ${save.location}`,
@@ -58,8 +84,8 @@ class StorageService {
 			};
 		}
 	}
-	async updateImage(base64: string, pathName: string, fileName: string) {
-		return this.saveImage(base64, pathName, fileName);
+	async updateImage(base64: string, pathName: string, fileName: string,extension:string) {
+		return this.saveImage(base64, pathName, fileName,extension);
 	}
 
 	async deleteImage(pathName: string, fileName: string) {
@@ -69,10 +95,7 @@ class StorageService {
 				pathName,
 			);
 			await fs.access(fullPath);
-			const removePng = await fs.unlink(`${fullPath}/${fileName}.png`);
-			const removeWebp =  await fs.unlink(`${fullPath}/${fileName}.webp`);
-			const removeJpg =  await fs.unlink(`${fullPath}/${fileName}.jpeg`);
-			console.log("Imagem deletada com sucesso")
+			await fs.unlink(`${fullPath}/${fileName}`);
 			return {
 				message: "Imagem deletada com sucesso",
 				data: null,

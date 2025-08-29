@@ -5,7 +5,7 @@ export interface factoryImageProps{
     id?:string
     type?:string
     location?:string
-    urls?:ImagesUrlsProps
+    url?:string
     processed?:boolean
     removeBackground?:boolean
     webhookUrl?:string
@@ -14,16 +14,16 @@ export interface factoryImageReturnProps{
     id?:string
     type:string | null
     location:string | null
-    urls:string | null
+    url:string | null
     processed:boolean | null
     removeBackground:boolean | null
     webhookUrl:string | null
 }
 
 export interface ImagesUrlsProps{
-    png?:string
-    jpeg?:string
-    webp?:string
+    "100%"?:string
+    "50%"?:string
+    "25%"?:string
 }
 
 class ImageFactory {
@@ -32,7 +32,7 @@ class ImageFactory {
     private type?:string
     private location?:string
     private processed?:boolean
-    private urls?:ImagesUrlsProps
+    private url?:string
     private removeBackground?:boolean
     private webhookUrl?:string
     constructor(data:factoryImageProps){
@@ -40,21 +40,21 @@ class ImageFactory {
         this.id = data.id
         this.type = data.type
         this.location = data.location
-        this.urls = data.urls
+        this.url = data.url
         this.processed = data.processed
         this.removeBackground =data.removeBackground
         this.webhookUrl = data.webhookUrl
     }
     public async execute():Promise<"image not saved" | Images>{
-        const factoryUrlsObject ={
-            png:(this.urls && this.urls.png) ?? null,
-            jpeg:(this.urls && this.urls.jpeg) ?? null,
-            webp:(this.urls && this.urls.webp) ?? null
-        }
+        // const factoryUrlsObject ={
+        //     "100%":(this.urls && this.urls."100%") ?? null,
+        //     "50%":(this.urls && this.urls."50%") ?? null,
+        //     "25%":(this.urls && this.urls."25%") ?? null
+        // }
         const factoryObject:factoryImageReturnProps = {
             id:this.id ?? undefined,
             type:this.type ?? null,
-            urls:JSON.stringify(factoryUrlsObject) ?? null,
+            url:this.url ?? null,
             location:this.location ?? null,
             processed:this.processed ?? null,
             removeBackground:this.removeBackground ?? null,

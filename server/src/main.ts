@@ -16,7 +16,6 @@ import {
 	serverAddress,
 	storagePath,
 } from "./config/server.config";
-import { uploadRoutes } from "./routes/upload.routes";
 import { imageRoutes } from "./routes/images.routes";
 const serverAddressUrl = serverAddress;
 const server = fastify({
@@ -27,6 +26,8 @@ const server = fastify({
 server.setValidatorCompiler(validatorCompiler);
 server.setSerializerCompiler(serializerCompiler);
 server.register(fastifyMultipart, {
+	attachFieldsToBody:true,
+	
 	limits: {
 		fileSize: 10 * 1024 * 1024, // Limite de 10MB por arquivo
 	},

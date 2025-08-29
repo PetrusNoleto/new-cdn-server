@@ -4,7 +4,7 @@ export interface createImageProps{
     id?:string
     type:string | null
     location:string | null
-    urls:string | null
+    url:string | null
     processed:boolean | null
     removeBackground:boolean | null
     webhookUrl:string | null
