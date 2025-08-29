@@ -22,7 +22,6 @@ class UploadController {
 		try {
 			const buffer = await upload.toBuffer();
 			const base64 = `data:${upload.mimetype};base64,${buffer.toString("base64")}`;
-            console.log(base64)
 			 const saveOnDisk = await storageService.saveImage(
                 base64,
                 `images/uploads`,
