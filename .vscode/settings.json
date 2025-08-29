@@ -1,0 +1,39 @@
+{
+	// Biome integration for VS Code
+	"biome.enabled": true,
+	// Auto-format on save with Biome
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "biomejs.biome", // Set Biome as the default formatter for relevant files
+
+	"explorer.excludeGitIgnore": false,
+
+	// Specify which languages Biome should format (adjust as needed)
+	"[javascript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[json]": {
+		// Biome also formats JSON
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[jsonc]": {
+		// Biome also formats JSONC
+		"editor.defaultFormatter": "biomejs.biome"
+	}
+
+	// Optional: If you have a biome.json file in your project, Biome will pick it up.
+	// No explicit setting is usually needed for this.
+
+	// Other Biome related settings (less common to change here, usually in biome.json)
+	// "biome.formatter.enabled": true,
+	// "biome.linter.enabled": true,
+	// "biome.organizeImports.enabled": true
+}
