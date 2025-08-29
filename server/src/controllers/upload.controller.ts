@@ -25,7 +25,7 @@ class UploadController {
             console.log(base64)
 			 const saveOnDisk = await storageService.saveImage(
                 base64,
-                `images/${newId}`,
+                `images/uploads`,
                 newId,)
             if (saveOnDisk.error !== null) {
                 return reply.status(400).send({ message: "Erro ao salvar o arquivo." });
