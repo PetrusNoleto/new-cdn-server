@@ -16,9 +16,9 @@ datasource db {
 
 model Images {
   id String @id @default(uuid(7))
-  tipe String?
+  type String?
   location String?
-  urls String?
+  url String?
   processed Boolean? @default(false)  
   removeBackground Boolean? @default(false)
   backgroundRemovedIn DateTime?
