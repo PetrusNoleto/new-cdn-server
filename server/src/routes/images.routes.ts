@@ -29,4 +29,12 @@ export async function imageRoutes(api: FastifyInstance) {
 		},
 		handler: imageController.find,
 	});
+	 api.withTypeProvider<ZodTypeProvider>().put("/:id", {
+		schema: {
+			tags: ["Imagens"],
+			summary: "update image",
+			description: "update image",
+		},
+		handler: imageController.updateProcessedImage,
+	});
 }
