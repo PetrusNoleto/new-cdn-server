@@ -124,6 +124,57 @@ class ImageController {
     public async listProcessed(request: FastifyRequest, reply: FastifyReply){
 
     }
+    public async updateProcessedImage(request: FastifyRequest, reply: FastifyReply){
+        const {id} = request.params as {id:string}
+        const images = request.body as { [key: string]: MultipartFile | MultipartFile[] };
+        const partsList: Multipart[] = Object.values(images).flat();
+        // const upload = await request.file();
+		if (partsList.length === 0) {
+			return reply.status(400).send({ message: "Nenhum arquivo enviado." });
+		}
+        const savedImages = []
+        for(const image of partsList){
+          if (!image.mimetype.startsWith("image/")) {
+			return reply.status(400).send({
+				message: "Tipo de arquivo inválido. Apenas imagens são permitidas.",
+			});
+		 }
+         if(image.type === "file"){
+            const buffer = await image.toBuffer();
+            const extension = image.mimetype.split("/")[1]
+		    const base64 = `data:${image.mimetype};base64,${buffer.toString("base64")}`;
+            const saveOnDisk = await storageService.saveImage(
+            base64,
+            `images/processed`,
+            `${id}.${extension}`,
+            extension    
+        )
+            if (saveOnDisk.error !== null) {
+                savedImages.push({
+                    image:id,
+                    saved:false,
+                    deleted:false
+                 })
+            }
+            const updateImageOnDatabase =saveOnDisk.data ? await new ImageRepository().updateProcessedImage(id,saveOnDisk.data.url) : null       
+            if(!updateImageOnDatabase){
+                const deleteImage = await storageService.deleteImage(`images/processed`,id)
+                 savedImages.push({
+                    image:id,
+                    saved:deleteImage.message !== "Imagem deletada com sucesso" ? true : false,
+                    deleted:deleteImage.message === "Imagem deletada com sucesso" ? true : false
+                 })
+            }else{
+                 savedImages.push({
+                    image:id,
+                    saved:true,
+                    deleted:false
+                 })
+            }
+           return reply.status(201).send(savedImages); 
+         }  
+        }
+    }
 }
 export const imageController = new ImageController()
 export default imageController

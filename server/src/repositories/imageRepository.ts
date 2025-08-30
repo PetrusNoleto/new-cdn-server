@@ -44,5 +44,23 @@ class ImageRepository {
             return null
         }
     }
+     public async updateProcessedImage(id:string,location:string){
+        try{
+            return await databaseConnection.images.update({
+                where:{
+                    id,
+                },
+                data:{
+                    processed:true,
+                    backgroundRemovedUrl:location,
+                    removeBackground:true,
+                    backgroundRemovedIn:new Date(),
+                    updated:new Date(),     
+                }
+            })
+        }catch(error){
+            return null
+        }
+    }
 }
 export default ImageRepository

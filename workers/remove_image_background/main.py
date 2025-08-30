@@ -25,8 +25,8 @@ INPUT_DIR = STORAGE_DIR / "downloads"
 PROCESSED_DIR = STORAGE_DIR / "processed"
 
 # Frequência (em segundos) que o worker irá verificar a API.
-# 3600 segundos = 1 hora
-POLL_INTERVAL = 3600
+# 300 segundos = 5 minutos
+POLL_INTERVAL = 300
 
 # Configuração básica de logging para acompanhar o que o worker está fazendo.
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -59,9 +59,10 @@ def fetch_images_from_queue() -> list:
 
 def download_image(image_url: str, image_id: str) -> Path | None:
     """Baixa a imagem da URL fornecida e a salva no diretório de entrada."""
+    apiMode = "http"
     try:
         if not image_url.startswith(('http://', 'https://')):
-            image_url = f"http://{image_url.lstrip('/')}"
+            image_url = f"{apiMode}://{image_url.lstrip('/')}"
             
         logging.info(f"Baixando imagem: {image_url}")
         response = requests.get(image_url, stream=True)
@@ -103,27 +104,28 @@ def remove_background(input_path: Path, image_id: str) -> Path | None:
 def update_image_status(image_id: str, processed_image_path: Path) -> bool:
     """Envia a imagem processada (PUT) para a API e retorna True em caso de sucesso."""
     try:
+        # Constrói a URL final, por exemplo: http://seu-api-url.com/api/v1/images/some-image-id
         update_url = f"{API_BASE_URL.rstrip('/')}{API_UPDATE_ENDPOINT.rstrip('/')}/{image_id}"
-        background_removed_url = f"/static/processed/{processed_image_path.name}"
         
-        payload = {
-            "processed": True,
-            "backgroundRemovedIn": datetime.utcnow().isoformat() + "Z",
-            "backgroundRemovedUrl": background_removed_url
-        }
-
         with open(processed_image_path, 'rb') as f:
+            # O nome do campo ('file') é a chave no formulário multipart.
+            # Este nome deve ser o que a sua API espera receber para o arquivo.
+            # Pode ser 'file', 'image', 'upload', etc.
             files = {'file': (processed_image_path.name, f, 'image/png')}
             
-            logging.info(f"Enviando imagem processada e atualizando status para o ID: {image_id}")
-            response = requests.put(update_url, data=payload, files=files)
+            logging.info(f"Enviando imagem processada para o ID: {image_id}")
             
+            # A requisição agora envia apenas o arquivo no corpo como multipart/form-data
+            response = requests.put(update_url, files=files)
+            
+            # Lança uma exceção para códigos de erro HTTP (4xx ou 5xx)
             response.raise_for_status()
-            logging.info(f"Status da imagem {image_id} atualizado com sucesso!")
+            
+            logging.info(f"Imagem {image_id} enviada com sucesso!")
             return True
 
     except requests.exceptions.RequestException as e:
-        logging.error(f"Erro ao atualizar o status da imagem {image_id}: {e}")
+        logging.error(f"Erro ao enviar a imagem {image_id}: {e}")
         return False
     except IOError as e:
         logging.error(f"Erro ao ler o arquivo de imagem processado {processed_image_path}: {e}")
@@ -163,7 +165,7 @@ def main():
         images_to_process = fetch_images_from_queue()
         
         if not images_to_process:
-            logging.info(f"Nenhuma imagem na fila. Próxima verificação em 1 hora.")
+            logging.info(f"Nenhuma imagem na fila. Próxima verificação em 5 minutos.")
         
         for image_data in images_to_process:
             image_id = image_data.get("id")
